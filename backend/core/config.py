@@ -1,59 +1,22 @@
 """
-X-Bridge AI - Core Configuration
+X-Bridge AI - Core Config
+Reads settings from environment variables with sensible defaults.
 """
 
-from pydantic_settings import BaseSettings
-from typing import List
+import os
 
 
-class Settings(BaseSettings):
-    # Application
+class Settings:
     APP_NAME: str = "X-Bridge AI"
-    ENVIRONMENT: str = "development"
-    DEBUG: bool = True
-    SECRET_KEY: str = "xbridge-secret-change-in-production"
-    
-    # Database
-    DATABASE_URL: str = "postgresql+asyncpg://xbridge:xbridge_secret@localhost:5432/xbridge_db"
-    DATABASE_POOL_SIZE: int = 10
-    DATABASE_MAX_OVERFLOW: int = 20
-    
-    # Redis
-    REDIS_URL: str = "redis://localhost:6379/0"
-    
-    # ChromaDB
-    CHROMADB_HOST: str = "localhost"
-    CHROMADB_PORT: int = 8001
-    CHROMADB_COLLECTION: str = "xbridge_knowledge"
-    
-    # AI
-    GEMINI_API_KEY: str = ""
-    GEMINI_MODEL: str = "gemini-1.5-pro"
-    LANGGRAPH_MEMORY_TTL: int = 3600
-    
-    # CORS
-    ALLOWED_ORIGINS: List[str] = [
-        "http://localhost:3000",
-        "http://localhost:3001",
-        "https://app.xbridge.ai",
+    ENVIRONMENT: str = os.getenv("ENVIRONMENT", "production")
+    ALLOWED_ORIGINS: list = [
+        o.strip()
+        for o in os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
+        if o.strip()
     ]
-    
-    # JWT
-    JWT_SECRET: str = "xbridge-jwt-secret"
-    JWT_ALGORITHM: str = "HS256"
-    JWT_EXPIRE_MINUTES: int = 60 * 24  # 24 hours
-    
-    # File Storage
-    UPLOAD_DIR: str = "/tmp/xbridge/uploads"
-    MAX_UPLOAD_SIZE_MB: int = 50
-    
-    # Rate Limiting
-    RATE_LIMIT_REQUESTS: int = 100
-    RATE_LIMIT_WINDOW_SECONDS: int = 60
-    
-    class Config:
-        env_file = ".env"
-        case_sensitive = True
+    GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
+    GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-1.5-pro")
+    JWT_SECRET: str = os.getenv("JWT_SECRET", "xbridge-secret")
 
 
 settings = Settings()
